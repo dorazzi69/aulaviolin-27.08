@@ -51,13 +51,17 @@ function App() {
   const [erro, setErro] = useState(null)
 
   useEffect(() => {
+    const controle = new AbortController()
+    const signal = controle.signal
+
     async function buscarUsuarios() {
       try {
         setCarregando(true)
         setErro(null)
 
         const resposta = await fetch(
-          'https://jsonplaceholder.typicode.com/users'
+          'https://jsonplaceholder.typicode.com/users',
+          { signal }
         )
 
         if (!resposta.ok) {
@@ -68,13 +72,17 @@ function App() {
 
         setUsuarios(dados)
       } catch (e) {
-        setErro(e.message)
+        if (e.name !== 'AbortError') {
+          setErro(e.message)
+        }
       } finally {
         setCarregando(false)
       }
     }
 
     buscarUsuarios()
+
+    return () => controle.abort()
   }, [])
 
   return (
