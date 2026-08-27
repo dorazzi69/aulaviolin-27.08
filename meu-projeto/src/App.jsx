@@ -48,16 +48,30 @@ function App() {
 
   const [usuarios, setUsuarios] = useState([])
   const [carregando, setCarregando] = useState(true)
+  const [erro, setErro] = useState(null)
 
   useEffect(() => {
     async function buscarUsuarios() {
-      const resposta = await fetch(
-        'https://jsonplaceholder.typicode.com/users'
-      )
-      const dados = await resposta.json()
+      try {
+        setCarregando(true)
+        setErro(null)
 
-      setUsuarios(dados)
-      setCarregando(false)
+        const resposta = await fetch(
+          'https://jsonplaceholder.typicode.com/users'
+        )
+
+        if (!resposta.ok) {
+          throw new Error(`HTTP ${resposta.status}`)
+        }
+
+        const dados = await resposta.json()
+
+        setUsuarios(dados)
+      } catch (e) {
+        setErro(e.message)
+      } finally {
+        setCarregando(false)
+      }
     }
 
     buscarUsuarios()
@@ -105,6 +119,8 @@ function App() {
 
         {carregando ? (
           <p>Carregando...</p>
+        ) : erro ? (
+          <p>Erro: {erro}</p>
         ) : (
           <ul>
             {usuarios.map((usuario) => (
