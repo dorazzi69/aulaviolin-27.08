@@ -1,6 +1,62 @@
 import { useEffect, useState } from 'react'
 import './App.css'
 
+function StatusAPI() {
+  const [itens, setItens] = useState([])
+  const [carregando, setCarregando] = useState(true)
+  const [erro, setErro] = useState(null)
+
+  useEffect(() => {
+    const controle = new AbortController()
+    const signal = controle.signal
+
+    async function buscar() {
+      try {
+        setCarregando(true)
+        setErro(null)
+
+        await new Promise(r => setTimeout(r, 1000))
+
+        const resp = await fetch(
+          'https://jsonplaceholder.typicode.com/users',
+          { signal }
+        )
+
+        if (!resp.ok) {
+          throw new Error(`HTTP ${resp.status}`)
+        }
+
+        const data = await resp.json()
+        setItens(data)
+      } catch (e) {
+        if (e.name !== 'AbortError') {
+          setErro(e.message)
+        }
+      } finally {
+        setCarregando(false)
+      }
+    }
+
+    buscar()
+
+    return () => controle.abort()
+  }, [])
+
+  if (carregando) {
+    return <p>Carregando...</p>
+  }
+
+  if (erro) {
+    return <p>Erro: {erro}</p>
+  }
+
+  if (itens.length === 0) {
+    return <p>Nenhum item encontrado.</p>
+  }
+
+  return <p>Sucesso: {itens.length} itens carregados.</p>
+}
+
 function App() {
   const [comentarios, setComentarios] = useState([])
 
@@ -46,45 +102,6 @@ function App() {
     buscarUsuario()
   }, [])
 
-  const [usuarios, setUsuarios] = useState([])
-  const [carregando, setCarregando] = useState(true)
-  const [erro, setErro] = useState(null)
-
-  useEffect(() => {
-    const controle = new AbortController()
-    const signal = controle.signal
-
-    async function buscarUsuarios() {
-      try {
-        setCarregando(true)
-        setErro(null)
-
-        const resposta = await fetch(
-          'https://jsonplaceholder.typicode.com/users',
-          { signal }
-        )
-
-        if (!resposta.ok) {
-          throw new Error(`HTTP ${resposta.status}`)
-        }
-
-        const data = []
-
-        setUsuarios(data)
-      } catch (e) {
-        if (e.name !== 'AbortError') {
-          setErro(e.message)
-        }
-      } finally {
-        setCarregando(false)
-      }
-    }
-
-    buscarUsuarios()
-
-    return () => controle.abort()
-  }, [])
-
   return (
     <>
       <section id="center">
@@ -123,23 +140,9 @@ function App() {
           </>
         )}
 
-        <h1>Exercício 5 - Lista de usuários</h1>
+        <h1>Exercício 5 - Status da API</h1>
 
-        {carregando ? (
-          <p>Carregando...</p>
-        ) : erro ? (
-          <p>Erro: {erro}</p>
-        ) : usuarios.length === 0 ? (
-          <p>Nenhum usuário encontrado.</p>
-        ) : (
-          <ul>
-            {usuarios.map((usuario) => (
-              <li key={usuario.id}>
-                {usuario.name}
-              </li>
-            ))}
-          </ul>
-        )}
+        <StatusAPI />
 
       </section>
     </>
