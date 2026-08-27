@@ -68,9 +68,9 @@ function App() {
           throw new Error(`HTTP ${resposta.status}`)
         }
 
-        const dados = await resposta.json()
+        const data = []
 
-        setUsuarios(dados)
+        setUsuarios(data)
       } catch (e) {
         if (e.name !== 'AbortError') {
           setErro(e.message)
@@ -129,6 +129,8 @@ function App() {
           <p>Carregando...</p>
         ) : erro ? (
           <p>Erro: {erro}</p>
+        ) : usuarios.length === 0 ? (
+          <p>Nenhum usuário encontrado.</p>
         ) : (
           <ul>
             {usuarios.map((usuario) => (
