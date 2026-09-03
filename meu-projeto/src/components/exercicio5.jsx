@@ -14,7 +14,7 @@ function Exercicio5() {
         setCarregando(true)
         setErro(null)
 
-        await new Promise((resolve) => setTimeout(resolve, 1000))
+        await new Promise((resolve) => setTimeout(resolve, 2000))
 
         const resposta = await fetch(
           'https://jsonplaceholder.typicode.com/users',
