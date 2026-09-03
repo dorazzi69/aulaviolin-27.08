@@ -15,7 +15,7 @@ function Exercicio3() {
         setErro(null)
 
         const resposta = await fetch(
-          'https://jsonplaceholder.typicode.com/users',
+          'https://jsonplaceholder.typicode.com/usuariosenterrado',
           { signal }
         )
 
